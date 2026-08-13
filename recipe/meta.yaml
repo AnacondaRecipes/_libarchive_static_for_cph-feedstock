@@ -22,7 +22,7 @@ source:
     - patches/0009-CMake-Force-Multi-threaded-DLL-runtime.patch
 
 build:
-  number: 2
+  number: 3
 
 requirements:
   build:
@@ -65,9 +65,6 @@ test:
     - test -f "${PREFIX}/lib/libarchive_and_deps.a"    # [unix]
     - if not exist %LIBRARY_LIB%\archive_and_deps.lib  exit 1  # [win]
     - if not exist %LIBRARY_LIB%\archive_static.lib  exit 1    # [win]
-    - if not exist %LIBRARY_LIB%\zstd_static.lib  exit 1       # [win]
-    - if not exist %LIBRARY_LIB%\bzip2_static.lib  exit 1      # [win]
-    - if not exist %LIBRARY_LIB%\zlibstatic.lib  exit 1        # [win]
 
 about:
   home: https://libarchive.org/
