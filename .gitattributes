@@ -4,7 +4,7 @@
 *.diff text eol=lf
 meta.yaml text eol=lf
 build.sh text eol=lf
-bld.bat text eol=crlf
+bld.bat -text
 
 # github helper pieces to make some files not show up in diffs automatically
 .azure-pipelines/* linguist-generated=true
