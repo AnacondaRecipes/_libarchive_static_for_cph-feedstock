@@ -3,6 +3,9 @@ set LIB=%LIBRARY_LIB%;%LIB%
 set LIBPATH=%LIBRARY_LIB%;%LIBPATH%
 set INCLUDE=%LIBRARY_INC%;%INCLUDE%
 
+:: Match Unix build.sh (--without-cng). VS2008 logic below may override this.
+set ENABLE_CNG=NO
+
 :: VS2008 doesn't have stdbool.h so copy in our own
 :: to 'lib' where the other headers are so it gets picked up.
 if "%VS_MAJOR%" == "9" (
@@ -40,7 +43,12 @@ set C99_TO_C89_CONV_DEBUG_LEVEL=1
 :skip_c99_wrap
 :: set cflags because NDEBUG is set in Release configuration, which errors out in test suite due to no assert
 
-cmake -G "%CMAKE_GENERATOR%" ^
+set ENABLE_SAFESEH=AUTO
+if "%target_platform%"=="win-arm64" set ENABLE_SAFESEH=OFF
+
+cmake -G "Ninja" ^
+      %CMAKE_ARGS% ^
+      -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ^
       -DCMAKE_INSTALL_PREFIX="%LIBRARY_PREFIX%" ^
       %COMPILER% ^
       -DCMAKE_BUILD_TYPE=Release ^
@@ -64,7 +72,7 @@ cmake -G "%CMAKE_GENERATOR%" ^
       -DENABLE_LibGCC=OFF ^
       -DENABLE_NETTLE=OFF ^
       -DENABLE_OPENSSL=OFF ^
-      -DENABLE_SAFESEH=AUTO ^
+      -DENABLE_SAFESEH=%ENABLE_SAFESEH% ^
       -DENABLE_TAR=OFF ^
       -DENABLE_XATTR=ON ^
       -DENABLE_ZLIB=ON ^
@@ -105,6 +113,11 @@ rd /s /q %PREFIX%\Library\share\man
 del %PREFIX%\Library\bin\archive.DLL
 del %PREFIX%\Library\lib\archive.lib
 
+set LIB_MACHINE=
+if "%target_platform%"=="win-arm64" set LIB_MACHINE=/MACHINE:ARM64
+if "%target_platform%"=="win-64" set LIB_MACHINE=/MACHINE:X64
+
 pushd %PREFIX%\Library\lib
-lib.exe /OUT:archive_and_deps.lib archive_static.lib zstd_static.lib bzip2_static.lib zlibstatic.lib
+lib.exe %LIB_MACHINE% /OUT:archive_and_deps.lib archive_static.lib zstd_static.lib bzip2_static.lib zlibstatic.lib
+if errorlevel 1 exit /b 1
 popd

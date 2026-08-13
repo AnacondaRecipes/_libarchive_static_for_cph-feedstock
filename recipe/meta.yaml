@@ -22,10 +22,11 @@ source:
     - patches/0009-CMake-Force-Multi-threaded-DLL-runtime.patch
 
 build:
-  number: 0
+  number: 3
 
 requirements:
   build:
+    - {{ stdlib('c') }}
     - {{ compiler('c') }}
     # Does not work in this recipe at present
     # we manually convert C99 to C89 instead.
@@ -36,19 +37,17 @@ requirements:
     - libtool     # [unix]
     - pkg-config  # [unix]
     - cmake       # [win]
+    - ninja-base  # [win]
     - make        # [unix]
-    # - ninja       # [win]
-    - m2-patch  # [win]
-    - m2-gcc-libs  # [win]
-    - patch  # [not win]
+    - msys2-gcc-libs  # [win]
     # Used by bld.bat as an in-build test
     # - curl        # [win]
   host:
     - msinttypes  # [win and vc<14]
-    - bzip2
-    - libiconv    # [osx]
-    - zlib
-    - zstd
+    - bzip2 {{ bzip2 }}
+    - libiconv {{ libiconv }}  # [osx]
+    - zlib {{ zlib }}
+    - zstd {{ zstd }}
 
 test:
   commands:
@@ -66,9 +65,6 @@ test:
     - test -f "${PREFIX}/lib/libarchive_and_deps.a"    # [unix]
     - if not exist %LIBRARY_LIB%\archive_and_deps.lib  exit 1  # [win]
     - if not exist %LIBRARY_LIB%\archive_static.lib  exit 1    # [win]
-    - if not exist %LIBRARY_LIB%\zstd_static.lib  exit 1       # [win]
-    - if not exist %LIBRARY_LIB%\bzip2_static.lib  exit 1      # [win]
-    - if not exist %LIBRARY_LIB%\zlibstatic.lib  exit 1        # [win]
 
 about:
   home: https://libarchive.org/
@@ -77,8 +73,6 @@ about:
   license_family: BSD
   dev_url: https://github.com/libarchive/libarchive
   doc_url: https://github.com/libarchive/libarchive/wiki
-  doc_source_url: https://github.com/libarchive/libarchive/tree/master/doc
-  license_url: https://github.com/libarchive/libarchive/blob/master/COPYING
   license_file:
     - COPYING
     - static_deps_licenses/bzip2.txt
