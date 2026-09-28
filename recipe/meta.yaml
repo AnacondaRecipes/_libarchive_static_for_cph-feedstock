@@ -39,7 +39,7 @@ requirements:
     - cmake       # [win]
     - make        # [unix]
     # - ninja       # [win]
-    - m2-gcc-libs  # [win]
+    - msys2-gcc-libs  # [win]
     # Used by bld.bat as an in-build test
     # - curl        # [win]
   host:
